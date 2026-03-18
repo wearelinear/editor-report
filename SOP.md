@@ -1,8 +1,7 @@
-# SOP: Weekly Editor Report Refresh
+# SOP: Weekly Creative Output Report Refresh
 
 **Live report:** https://wearelinear.github.io/editor-report/
-**Tracks:** Naqeeb, Lucas, Rami, Felipe
-**Channels:** #linear-pod-1-qc-requests & #linear-pod-2-qc-requests
+**Tracks:** Naqeeb, Lucas, Rami, Felipe, Matt, Ardee, Bruno Volpe, Rodrigo, Pilar
 
 ---
 
@@ -10,9 +9,9 @@
 
 Open **Claude Code** and type:
 
-> "Refresh the editor report for the last 7 days"
+> "Refresh the creative output report for the last 7 days"
 
-Claude will search both QC Slack channels, add new entries, push to GitHub, and the live site updates within ~1 minute.
+Claude will search all three Slack channels, add new entries, push to GitHub, and the live site updates within ~1 minute.
 
 ---
 
@@ -44,7 +43,7 @@ This creates an `editor-report/` folder — that's where Claude will make edits 
 ### 5. Tell Claude where the repo is
 When you first run a refresh on a new machine, tell Claude:
 
-> "Refresh the editor report for the last 7 days — the repo is cloned at [full path to editor-report folder]"
+> "Refresh the creative output report for the last 7 days — the repo is cloned at [full path to editor-report folder]"
 
 After the first run, Claude will remember the path.
 
@@ -52,14 +51,14 @@ After the first run, Claude will remember the path.
 
 ## Custom Date Ranges
 
-> "Refresh the editor report from March 11 to March 17"
-> "Check the last 2 weeks for the editor report"
+> "Refresh the creative output report from March 11 to March 17"
+> "Check the last 2 weeks for the creative output report"
 
 ---
 
-## Adding a New Editor
+## Adding a New Team Member
 
-> "Add [Name] to the editor report — their Slack ID is [ID]"
+> "Add [Name] to the creative output report — their Slack ID is [ID], they're in Pod [X]"
 
 ---
 
@@ -69,4 +68,5 @@ After the first run, Claude will remember the path.
 |---|---|
 | GitHub repo | https://github.com/wearelinear/editor-report |
 | Live URL | https://wearelinear.github.io/editor-report/ |
-| Slack channels | #linear-pod-1-qc-requests, #linear-pod-2-qc-requests |
+| Pods 1 & 2 channels | #linear-pod-1-qc-requests, #linear-pod-2-qc-requests |
+| Pod 4 channel | #linear-pod-4-creative-production |

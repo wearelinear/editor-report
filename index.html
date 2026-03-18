@@ -290,7 +290,6 @@
 <div class="top-bar">
   <div>
     <h1>Editor Delivery Report</h1>
-    <p id="period-label">Dec 1, 2025 – Mar 17, 2026</p>
   </div>
 </div>
 
@@ -770,9 +769,6 @@ function applyFilter() {
   const to   = document.getElementById('date-to').value;
   if (!from || !to) return;
   const fromDate = new Date(from), toDate = new Date(to);
-
-  const fmtL = d => new Date(d).toLocaleDateString('en-US', { month:'short', day:'numeric', year:'numeric' });
-  document.getElementById('period-label').textContent = `${fmtL(from)} – ${fmtL(to)}`;
 
   const counts = {};
   EDITORS.forEach(({ key }) => counts[key] = { p1:0, p2:0, p4:0 });

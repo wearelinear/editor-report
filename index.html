@@ -1,0 +1,640 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Editor Delivery Report</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    :root {
+      --bg: #0f0f0f;
+      --surface: #1a1a1a;
+      --surface2: #202020;
+      --border: #2a2a2a;
+      --text: #e8e8e8;
+      --muted: #666;
+      --lucas:  #6c63ff;
+      --naqeeb: #ff9500;
+      --rami:   #34c759;
+      --felipe: #ff3b5c;
+    }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      min-height: 100vh;
+      padding: 48px 32px;
+    }
+
+    header {
+      max-width: 1100px;
+      margin: 0 auto 32px;
+      display: flex;
+      align-items: flex-end;
+      justify-content: space-between;
+      gap: 24px;
+      flex-wrap: wrap;
+    }
+
+    header h1 { font-size: 28px; font-weight: 700; letter-spacing: -0.5px; margin-bottom: 6px; }
+    header p  { color: var(--muted); font-size: 14px; }
+
+    .filter-bar {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 10px 16px;
+      flex-shrink: 0;
+    }
+
+    .filter-bar label { font-size: 12px; color: var(--muted); font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; white-space: nowrap; }
+
+    .filter-bar input[type="date"] {
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      color: var(--text);
+      font-size: 13px;
+      padding: 5px 10px;
+      cursor: pointer;
+      outline: none;
+      font-family: inherit;
+    }
+
+    .filter-bar input[type="date"]:focus { border-color: #444; }
+    .filter-sep { color: var(--muted); font-size: 13px; }
+
+    .filter-btn {
+      background: #2a2a2a;
+      border: 1px solid #3a3a3a;
+      color: var(--text);
+      font-size: 12px;
+      font-weight: 600;
+      padding: 5px 12px;
+      border-radius: 6px;
+      cursor: pointer;
+      font-family: inherit;
+      transition: background 0.15s;
+    }
+    .filter-btn:hover { background: #333; }
+
+    .summary {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 16px;
+      max-width: 1100px;
+      margin: 0 auto 32px;
+    }
+
+    .summary-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 24px 28px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .summary-card::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 3px;
+    }
+
+    .lucas-card::before  { background: var(--lucas); }
+    .naqeeb-card::before { background: var(--naqeeb); }
+    .rami-card::before   { background: var(--rami); }
+    .felipe-card::before { background: var(--felipe); }
+
+    .summary-card .editor-name { font-size: 12px; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 10px; }
+
+    .lucas-card  .editor-name { color: var(--lucas); }
+    .naqeeb-card .editor-name { color: var(--naqeeb); }
+    .rami-card   .editor-name { color: var(--rami); }
+    .felipe-card .editor-name { color: var(--felipe); }
+
+    .summary-card .big-number { font-size: 52px; font-weight: 800; line-height: 1; margin-bottom: 8px; letter-spacing: -2px; }
+    .summary-card .sub-label  { color: var(--muted); font-size: 13px; }
+
+    .summary-card .pod-breakdown { display: flex; gap: 16px; margin-top: 16px; padding-top: 16px; border-top: 1px solid var(--border); }
+    .pod-pill { font-size: 12px; color: var(--muted); }
+    .pod-pill span { color: var(--text); font-weight: 600; }
+
+    .bar-section {
+      max-width: 1100px;
+      margin: 0 auto 32px;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 24px 28px;
+    }
+
+    .bar-section h2 { font-size: 12px; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; color: var(--muted); margin-bottom: 20px; }
+
+    .bar-row { display: flex; align-items: center; gap: 16px; margin-bottom: 14px; }
+    .bar-row:last-child { margin-bottom: 0; }
+    .bar-label { width: 80px; font-size: 13px; font-weight: 600; flex-shrink: 0; }
+    .bar-track { flex: 1; background: var(--border); border-radius: 99px; height: 8px; overflow: hidden; }
+    .bar-fill  { height: 100%; border-radius: 99px; transition: width 0.4s ease; }
+    .lucas-fill  { background: var(--lucas); }
+    .naqeeb-fill { background: var(--naqeeb); }
+    .rami-fill   { background: var(--rami); }
+    .felipe-fill { background: var(--felipe); }
+    .bar-count { font-size: 14px; font-weight: 700; width: 32px; text-align: right; flex-shrink: 0; }
+
+    .editors { max-width: 1100px; margin: 0 auto; display: flex; flex-direction: column; gap: 24px; }
+
+    .editor-section { background: var(--surface); border: 1px solid var(--border); border-radius: 14px; overflow: hidden; }
+
+    .editor-header { display: flex; align-items: center; justify-content: space-between; padding: 20px 24px; border-bottom: 1px solid var(--border); }
+    .editor-header-left { display: flex; align-items: center; gap: 12px; }
+
+    .editor-dot { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; }
+    .lucas-dot  { background: var(--lucas); }
+    .naqeeb-dot { background: var(--naqeeb); }
+    .rami-dot   { background: var(--rami); }
+    .felipe-dot { background: var(--felipe); }
+
+    .editor-title { font-size: 16px; font-weight: 700; }
+
+    .editor-total { font-size: 12px; font-weight: 600; padding: 4px 12px; border-radius: 99px; }
+    .lucas-total  { background: rgba(108,99,255,0.15);  color: var(--lucas); }
+    .naqeeb-total { background: rgba(255,149,0,0.15);   color: var(--naqeeb); }
+    .rami-total   { background: rgba(52,199,89,0.15);   color: var(--rami); }
+    .felipe-total { background: rgba(255,59,92,0.15);   color: var(--felipe); }
+
+    .pod-tabs { display: flex; border-bottom: 1px solid var(--border); }
+
+    .pod-tab {
+      padding: 11px 20px;
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--muted);
+      cursor: pointer;
+      border-bottom: 2px solid transparent;
+      transition: all 0.2s;
+      user-select: none;
+    }
+
+    .pod-tab:hover { color: var(--text); }
+    .lucas-tab.active  { color: var(--lucas);  border-bottom-color: var(--lucas); }
+    .naqeeb-tab.active { color: var(--naqeeb); border-bottom-color: var(--naqeeb); }
+    .rami-tab.active   { color: var(--rami);   border-bottom-color: var(--rami); }
+    .felipe-tab.active { color: var(--felipe); border-bottom-color: var(--felipe); }
+
+    .pod-content { display: none; }
+    .pod-content.active { display: block; }
+
+    .creative-list { padding: 4px 0; }
+
+    .creative-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 10px 24px;
+      border-bottom: 1px solid var(--border);
+      transition: background 0.15s;
+    }
+
+    .creative-row:last-child { border-bottom: none; }
+    .creative-row:hover { background: rgba(255,255,255,0.03); }
+    .creative-row.hidden { display: none; }
+
+    .creative-row-left { display: flex; align-items: center; gap: 14px; }
+    .creative-num { font-size: 11px; color: var(--muted); width: 20px; text-align: right; flex-shrink: 0; }
+
+    .creative-id {
+      font-size: 14px;
+      font-weight: 600;
+      font-family: 'SF Mono', 'Fira Code', monospace;
+      color: var(--text);
+      text-decoration: none;
+      transition: color 0.15s;
+    }
+
+    .creative-id.has-link { text-decoration: underline; text-underline-offset: 3px; text-decoration-color: #444; }
+    .creative-id.has-link:hover { color: #aaa; text-decoration-color: #888; }
+
+    .creative-right { display: flex; align-items: center; gap: 12px; }
+    .creative-date  { font-size: 12px; color: var(--muted); white-space: nowrap; }
+
+    .link-icon {
+      opacity: 0;
+      font-size: 11px;
+      color: var(--muted);
+      transition: opacity 0.15s;
+      text-decoration: none;
+    }
+
+    .creative-row:hover .link-icon { opacity: 1; }
+
+    .month-divider {
+      padding: 7px 24px 5px;
+      font-size: 11px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      color: var(--muted);
+      background: rgba(255,255,255,0.02);
+      border-bottom: 1px solid var(--border);
+    }
+
+    .month-divider.hidden { display: none; }
+    .empty-pod { padding: 28px 24px; color: var(--muted); font-size: 13px; }
+    .no-results { padding: 24px; text-align: center; color: var(--muted); font-size: 13px; display: none; }
+    .no-results.visible { display: block; }
+
+    footer { max-width: 1100px; margin: 40px auto 0; color: var(--muted); font-size: 12px; text-align: center; }
+  </style>
+</head>
+<body>
+
+<header>
+  <div>
+    <h1>Editor Delivery Report</h1>
+    <p id="period-label">Dec 1, 2025 – Mar 17, 2026 &nbsp;·&nbsp; Pods 1 & 2 &nbsp;·&nbsp; QC submissions only</p>
+  </div>
+  <div class="filter-bar">
+    <label>From</label>
+    <input type="date" id="date-from" value="2025-12-01">
+    <span class="filter-sep">→</span>
+    <input type="date" id="date-to" value="2026-03-17">
+    <button class="filter-btn" onclick="applyFilter()">Apply</button>
+    <button class="filter-btn" onclick="resetFilter()">Reset</button>
+  </div>
+</header>
+
+<!-- Summary Cards -->
+<div class="summary" id="summary-cards"></div>
+
+<!-- Bar Chart -->
+<div class="bar-section">
+  <h2>Volume Comparison</h2>
+  <div id="bar-chart"></div>
+</div>
+
+<!-- Editor Sections -->
+<div class="editors" id="editor-sections"></div>
+
+<footer id="footer">Generated Mar 18, 2026 &nbsp;·&nbsp; Source: Slack #linear-pod-1-qc-requests & #linear-pod-2-qc-requests</footer>
+
+<script>
+// ═══════════════════════════════════════════════════════════════════════════
+//  DATA — append new entries here for each weekly refresh.
+//
+//  Format: { editor, pod, id, date, link }
+//    editor : 'lucas' | 'naqeeb' | 'rami' | 'felipe'
+//    pod    : 1 | 2
+//    id     : concept code string (e.g. 'LEO95')
+//    date   : 'YYYY-MM-DD'
+//    link   : Frame.io review URL, or null
+// ═══════════════════════════════════════════════════════════════════════════
+const DATA = [
+
+  // ── NAQEEB · Pod 1 ────────────────────────────────────────────────────
+  { editor:'naqeeb', pod:1, id:'LEO94',        date:'2025-12-05', link:'https://f.io/buaTFHuU' },
+  { editor:'naqeeb', pod:1, id:'GOT10',        date:'2025-12-10', link:'https://f.io/xFFRVJpK' },
+  { editor:'naqeeb', pod:1, id:'LEO97',        date:'2025-12-15', link:'https://f.io/VWQZAvrU' },
+  { editor:'naqeeb', pod:1, id:'POI109',       date:'2025-12-20', link:'https://f.io/gDFNoPik' },
+  { editor:'naqeeb', pod:1, id:'COF11',        date:'2025-12-25', link:'https://f.io/0wWFpe-A' },
+  { editor:'naqeeb', pod:1, id:'COF10',        date:'2026-01-05', link:'https://f.io/FPyTMDGv' },
+  { editor:'naqeeb', pod:1, id:'NTD05',        date:'2026-01-10', link:'https://f.io/_XtF3DaY' },
+  { editor:'naqeeb', pod:1, id:'COF09',        date:'2026-01-15', link:'https://f.io/GQeELCrG' },
+  { editor:'naqeeb', pod:1, id:'NTD09',        date:'2026-01-25', link:'https://f.io/CPr1iPmO' },
+  { editor:'naqeeb', pod:1, id:'NTD10',        date:'2026-02-01', link:'https://f.io/7hhqWpJE' },
+  { editor:'naqeeb', pod:1, id:'POI177',       date:'2026-02-20', link:'https://f.io/r4jdAGeM' },
+  { editor:'naqeeb', pod:1, id:'AUR10',        date:'2026-02-24', link:'https://f.io/MD6-hF30' },
+  { editor:'naqeeb', pod:1, id:'AUR09',        date:'2026-03-01', link:'https://f.io/1m5eEa-4' },
+  { editor:'naqeeb', pod:1, id:'BAN02',        date:'2026-03-07', link:'https://f.io/sL3YvAj5' },
+  { editor:'naqeeb', pod:1, id:'NTD16 (EN)',   date:'2026-03-12', link:'https://f.io/sfyXdZYd' },
+  { editor:'naqeeb', pod:1, id:'NTD16 (PL)',   date:'2026-03-12', link:'https://f.io/qDgTxAux' },
+
+  // ── NAQEEB · Pod 2 ────────────────────────────────────────────────────
+  { editor:'naqeeb', pod:2, id:'TS04',         date:'2025-12-05', link:'https://f.io/lbVmVwBm' },
+  { editor:'naqeeb', pod:2, id:'TS08.1',       date:'2026-01-05', link:'https://f.io/zM4gJVya' },
+  { editor:'naqeeb', pod:2, id:'SSL1.2',       date:'2026-01-13', link:'https://f.io/ksr-YX6a' },
+  { editor:'naqeeb', pod:2, id:'TS9.1',        date:'2026-02-03', link:'https://f.io/LFkAq1xA' },
+  { editor:'naqeeb', pod:2, id:'KOS1.1',       date:'2026-02-07', link:'https://f.io/y1cfa8Qp' },
+  { editor:'naqeeb', pod:2, id:'SSL4.2',       date:'2026-02-10', link:'https://f.io/Mdkvqoxl' },
+  { editor:'naqeeb', pod:2, id:'TS10.1',       date:'2026-02-12', link:'https://f.io/aJzrCMDp' },
+  { editor:'naqeeb', pod:2, id:'SSL3.2',       date:'2026-02-14', link:'https://f.io/L9ASFnT2' },
+  { editor:'naqeeb', pod:2, id:'SSL6.2',       date:'2026-02-16', link:'https://f.io/DFLLYtVe' },
+  { editor:'naqeeb', pod:2, id:'SSL5.2',       date:'2026-02-18', link:'https://f.io/rxUT3jLO' },
+  { editor:'naqeeb', pod:2, id:'SSL5.4',       date:'2026-02-20', link:'https://f.io/QgzZr9Jr' },
+  { editor:'naqeeb', pod:2, id:'TS12.2',       date:'2026-02-23', link:'https://f.io/zP4nOk-w' },
+  { editor:'naqeeb', pod:2, id:'VV48',         date:'2026-03-02', link:'https://f.io/qj1eAjMa' },
+  { editor:'naqeeb', pod:2, id:'VV50',         date:'2026-03-05', link:'https://f.io/SD01EAwS' },
+  { editor:'naqeeb', pod:2, id:'TFL7.1',       date:'2026-03-12', link:'https://f.io/n0xA4zNw' },
+
+  // ── LUCAS · Pod 1 ─────────────────────────────────────────────────────
+  { editor:'lucas', pod:1, id:'LEO95',         date:'2025-12-05', link:'https://f.io/dbu4exUv' },
+  { editor:'lucas', pod:1, id:'LEO96',         date:'2025-12-15', link:'https://f.io/QMV5VBOb' },
+  { editor:'lucas', pod:1, id:'GOT12',         date:'2025-12-20', link:'https://f.io/u8xv4VDY' },
+  { editor:'lucas', pod:1, id:'NTD06',         date:'2025-12-25', link:'https://f.io/mEuBAatP' },
+  { editor:'lucas', pod:1, id:'COF12',         date:'2026-01-03', link:'https://f.io/yFgi6suT' },
+  { editor:'lucas', pod:1, id:'GOT11',         date:'2026-01-08', link:'https://f.io/hIK3SbKM' },
+  { editor:'lucas', pod:1, id:'POI122',        date:'2026-01-12', link:'https://f.io/m-z_o5kq' },
+  { editor:'lucas', pod:1, id:'COF07',         date:'2026-01-18', link:'https://f.io/_8fk2xYX' },
+  { editor:'lucas', pod:1, id:'GOT09',         date:'2026-01-25', link:'https://f.io/jp5YbIhw' },
+  { editor:'lucas', pod:1, id:'MAX78',         date:'2026-01-30', link:'https://f.io/mjtiyrh3' },
+  { editor:'lucas', pod:1, id:'MAX79',         date:'2026-02-03', link:'https://f.io/qtxzR28S' },
+  { editor:'lucas', pod:1, id:'MAX81',         date:'2026-02-07', link:'https://f.io/zqp9FS6j' },
+  { editor:'lucas', pod:1, id:'POI114.B',      date:'2026-02-11', link:'https://f.io/dyGopYBI' },
+  { editor:'lucas', pod:1, id:'AUR02',         date:'2026-02-14', link:'https://f.io/1Qnhx0z1' },
+  { editor:'lucas', pod:1, id:'MAX80',         date:'2026-02-17', link:'https://f.io/nu-gF1pV' },
+  { editor:'lucas', pod:1, id:'NTD08',         date:'2026-02-20', link:'https://f.io/zJBPhuXO' },
+  { editor:'lucas', pod:1, id:'AUR03',         date:'2026-02-24', link:'https://f.io/KrSXpSDg' },
+  { editor:'lucas', pod:1, id:'POI135',        date:'2026-02-27', link:'https://f.io/XU1FcZNb' },
+  { editor:'lucas', pod:1, id:'POI179',        date:'2026-03-01', link:'https://f.io/wjlDDo7T' },
+  { editor:'lucas', pod:1, id:'POI138',        date:'2026-03-04', link:'https://f.io/qGLGaR3e' },
+  { editor:'lucas', pod:1, id:'POI182',        date:'2026-03-06', link:'https://f.io/rMfzRzna' },
+  { editor:'lucas', pod:1, id:'AUR12',         date:'2026-03-08', link:'https://f.io/It8wux0V' },
+  { editor:'lucas', pod:1, id:'NTD15',         date:'2026-03-11', link:'https://f.io/YE_eu6Pw' },
+  { editor:'lucas', pod:1, id:'AUR04',         date:'2026-03-14', link:'https://f.io/9CAxLIwa' },
+  { editor:'lucas', pod:1, id:'SUJ29',         date:'2026-03-16', link:'https://f.io/FiFJqyJF' },
+
+  // ── LUCAS · Pod 2 ─────────────────────────────────────────────────────
+  { editor:'lucas', pod:2, id:'TS7.1',         date:'2026-01-10', link:'https://f.io/wDow5Y9g' },
+  { editor:'lucas', pod:2, id:'KOS1.2',        date:'2026-01-20', link:'https://f.io/3X2S4zV2' },
+  { editor:'lucas', pod:2, id:'SSL2.3',        date:'2026-01-25', link:'https://f.io/u8Cj4Vhi' },
+  { editor:'lucas', pod:2, id:'TS9.2',         date:'2026-01-28', link:'https://f.io/TRmy_vpe' },
+  { editor:'lucas', pod:2, id:'WON30.1',       date:'2026-02-02', link:'https://f.io/q231EIod' },
+  { editor:'lucas', pod:2, id:'TFL2.1',        date:'2026-02-05', link:'https://f.io/7weP4kGL' },
+  { editor:'lucas', pod:2, id:'SSL5.1',        date:'2026-02-08', link:'https://f.io/kea9xvCa' },
+  { editor:'lucas', pod:2, id:'TFL4.2',        date:'2026-02-11', link:'https://f.io/2Q_Q7D7I' },
+  { editor:'lucas', pod:2, id:'KOS2.2',        date:'2026-02-14', link:'https://f.io/6e8CqxD7' },
+  { editor:'lucas', pod:2, id:'TS11.2',        date:'2026-02-17', link:'https://f.io/GEQi-8rz' },
+  { editor:'lucas', pod:2, id:'SSL6.1',        date:'2026-02-22', link:'https://f.io/Syk4UuEt' },
+  { editor:'lucas', pod:2, id:'TFL5.1+5.2',    date:'2026-02-25', link:'https://f.io/a8bm8jrO' },
+  { editor:'lucas', pod:2, id:'KOS3.1',        date:'2026-02-27', link:'https://f.io/Xm2SCIEm' },
+  { editor:'lucas', pod:2, id:'VV47',          date:'2026-03-01', link:'https://f.io/XApi_ZyP' },
+  { editor:'lucas', pod:2, id:'TS11.4',        date:'2026-03-04', link:'https://f.io/kRw5os3U' },
+  { editor:'lucas', pod:2, id:'VV51',          date:'2026-03-07', link:'https://f.io/3qdqt5nQ' },
+  { editor:'lucas', pod:2, id:'SSL7.2',        date:'2026-03-12', link:'https://f.io/aYqtVIQW' },
+  { editor:'lucas', pod:2, id:'TFL7.2',        date:'2026-03-14', link:'https://f.io/X1UmiiVg' },
+  { editor:'lucas', pod:2, id:'SUJ29',         date:'2026-03-16', link:'https://f.io/4P27THSr' },
+
+  // ── RAMI · Pod 1 ──────────────────────────────────────────────────────
+  { editor:'rami', pod:1, id:'POI106',         date:'2025-12-10', link:'https://f.io/Q0ZY23cJ' },
+  { editor:'rami', pod:1, id:'POI120',         date:'2026-01-05', link:'https://f.io/SxKBt8QS' },
+  { editor:'rami', pod:1, id:'NTD07',          date:'2026-01-15', link:'https://f.io/jULv2JYY' },
+  { editor:'rami', pod:1, id:'POI114',         date:'2026-01-18', link:'https://f.io/y4cO76Z7' },
+  { editor:'rami', pod:1, id:'AUR01',          date:'2026-02-12', link:'https://f.io/apVecdbM' },
+  { editor:'rami', pod:1, id:'POI137',         date:'2026-03-05', link:'https://f.io/jLvcrWhB' },
+  { editor:'rami', pod:1, id:'SUG28',          date:'2026-03-12', link:'https://f.io/YVYrDH11' },
+
+  // ── RAMI · Pod 2 ──────────────────────────────────────────────────────
+  { editor:'rami', pod:2, id:'POI116',         date:'2026-01-14', link:'https://f.io/TWCTZPim' },
+  { editor:'rami', pod:2, id:'POI134',         date:'2026-02-12', link:'https://f.io/cjnMCjWX' },
+  { editor:'rami', pod:2, id:'POI180',         date:'2026-03-03', link:'https://f.io/l48JRqnQ' },
+
+  // ── FELIPE · Pod 1 ────────────────────────────────────────────────────
+  { editor:'felipe', pod:1, id:'POI112',       date:'2025-12-03', link:'https://f.io/kWSdrAdl' },
+  { editor:'felipe', pod:1, id:'POI122',       date:'2025-12-04', link:'https://f.io/AtIZ36tn' },
+  { editor:'felipe', pod:1, id:'COF03',        date:'2025-12-08', link:'https://f.io/ZH16aBKv' },
+  { editor:'felipe', pod:1, id:'COF04',        date:'2025-12-12', link:'https://f.io/6GacSDQH' },
+  { editor:'felipe', pod:1, id:'COF15',        date:'2025-12-12', link:'https://f.io/4vjO-rU0' },
+  { editor:'felipe', pod:1, id:'NTD04',        date:'2025-12-18', link:'https://f.io/VrDTbAZD' },
+  { editor:'felipe', pod:1, id:'COF16',        date:'2025-12-20', link:'https://f.io/hjQXE5Qg' },
+  { editor:'felipe', pod:1, id:'POI124',       date:'2026-01-02', link:'https://f.io/oSIz_tif' },
+  { editor:'felipe', pod:1, id:'POI125',       date:'2026-01-05', link:'https://f.io/YRK4pWAj' },
+  { editor:'felipe', pod:1, id:'NTD11',        date:'2026-01-12', link:'https://f.io/jLuTmL3F' },
+  { editor:'felipe', pod:1, id:'NTD12',        date:'2026-01-12', link:'https://f.io/4KF3ymC4' },
+  { editor:'felipe', pod:1, id:'NTD14',        date:'2026-01-16', link:'https://f.io/7Gs4A222' },
+  { editor:'felipe', pod:1, id:'NTD13',        date:'2026-01-16', link:'https://f.io/V0pVpKYI' },
+  { editor:'felipe', pod:1, id:'POI123',       date:'2026-01-20', link:'https://f.io/bpQ0FlqM' },
+  { editor:'felipe', pod:1, id:'AUR05',        date:'2026-01-25', link:'https://f.io/fMSTaque' },
+  { editor:'felipe', pod:1, id:'AUR07',        date:'2026-02-01', link:'https://f.io/CNNB59Rn' },
+  { editor:'felipe', pod:1, id:'AUR06',        date:'2026-02-01', link:'https://f.io/GlvqXdG2' },
+  { editor:'felipe', pod:1, id:'POI129',       date:'2026-02-08', link:null },
+  { editor:'felipe', pod:1, id:'POI173',       date:'2026-02-12', link:'https://f.io/J_zfaj6O' },
+  { editor:'felipe', pod:1, id:'POI172',       date:'2026-02-12', link:'https://f.io/YTPvSgTV' },
+  { editor:'felipe', pod:1, id:'AUR08',        date:'2026-02-15', link:'https://f.io/Irbg4vse' },
+  { editor:'felipe', pod:1, id:'POI175',       date:'2026-02-18', link:'https://f.io/r9hYxPy7' },
+  { editor:'felipe', pod:1, id:'POI174',       date:'2026-02-18', link:'https://f.io/t-J0WAHZ' },
+  { editor:'felipe', pod:1, id:'POI130',       date:'2026-02-22', link:'https://f.io/E3R48aYb' },
+  { editor:'felipe', pod:1, id:'POI131',       date:'2026-02-22', link:'https://f.io/ZvV5oVUf' },
+  { editor:'felipe', pod:1, id:'POI133',       date:'2026-02-25', link:'https://f.io/j1l3kfrX' },
+  { editor:'felipe', pod:1, id:'NTD20',        date:'2026-03-02', link:'https://f.io/yoHGpLhc' },
+  { editor:'felipe', pod:1, id:'NTD21',        date:'2026-03-02', link:'https://f.io/n88W0Yow' },
+  { editor:'felipe', pod:1, id:'SUJ23',        date:'2026-03-10', link:'https://f.io/fFegx9EH' },
+  { editor:'felipe', pod:1, id:'NTD18',        date:'2026-03-14', link:'https://f.io/iJC-8erf' },
+
+  // ── FELIPE · Pod 2 ────────────────────────────────────────────────────
+  { editor:'felipe', pod:2, id:'TS01',         date:'2025-12-05', link:'https://f.io/EbH_Uii7' },
+  { editor:'felipe', pod:2, id:'TS05',         date:'2025-12-05', link:'https://f.io/fdl8vyTw' },
+  { editor:'felipe', pod:2, id:'TS9.4',        date:'2026-02-15', link:'https://f.io/9v0qMTKa' },
+  { editor:'felipe', pod:2, id:'SUJ26',        date:'2026-02-25', link:'https://f.io/A87vLrAV' },
+  { editor:'felipe', pod:2, id:'SUJ25',        date:'2026-02-25', link:'https://f.io/a-YJOhgp' },
+
+  // ── WEEK OF MAR 18+ — append new entries below ────────────────────────
+  // { editor:'lucas', pod:1, id:'CONCEPT', date:'2026-03-18', link:'https://f.io/...' },
+
+];
+
+// ═══════════════════════════════════════════════════════════════════════════
+//  CONFIG
+// ═══════════════════════════════════════════════════════════════════════════
+const EDITORS = [
+  { key: 'lucas',   label: 'Lucas Krikorian' },
+  { key: 'naqeeb',  label: 'Naqeeb' },
+  { key: 'felipe',  label: 'Felipe' },
+  { key: 'rami',    label: 'Rami Sleem' },
+];
+
+const MONTH_NAMES = ['January','February','March','April','May','June','July','August','September','October','November','December'];
+
+// ═══════════════════════════════════════════════════════════════════════════
+//  BUILD
+// ═══════════════════════════════════════════════════════════════════════════
+function fmt(dateStr) {
+  const [, m, d] = dateStr.split('-');
+  return MONTH_NAMES[+m - 1].slice(0, 3) + ' ' + +d;
+}
+
+function monthKey(dateStr) { return dateStr.slice(0, 7); } // 'YYYY-MM'
+
+function monthLabel(mk) {
+  const [y, m] = mk.split('-');
+  return MONTH_NAMES[+m - 1] + ' ' + y;
+}
+
+function buildSummaryCards() {
+  const el = document.getElementById('summary-cards');
+  el.innerHTML = EDITORS.map(({ key, label }) => `
+    <div class="summary-card ${key}-card">
+      <div class="editor-name">${label}</div>
+      <div class="big-number" id="${key}-count">0</div>
+      <div class="sub-label">creatives delivered</div>
+      <div class="pod-breakdown">
+        <div class="pod-pill">Pod 1 <span id="${key}-p1-count">0</span></div>
+        <div class="pod-pill">Pod 2 <span id="${key}-p2-count">0</span></div>
+      </div>
+    </div>`).join('');
+}
+
+function buildBarChart() {
+  const el = document.getElementById('bar-chart');
+  el.innerHTML = EDITORS.map(({ key, label }) => `
+    <div class="bar-row">
+      <div class="bar-label" style="color:var(--${key})">${label.split(' ')[0]}</div>
+      <div class="bar-track"><div class="bar-fill ${key}-fill" id="bar-${key}" style="width:0%"></div></div>
+      <div class="bar-count" id="bar-${key}-n">0</div>
+    </div>`).join('');
+}
+
+function buildEditorSections() {
+  const el = document.getElementById('editor-sections');
+  el.innerHTML = EDITORS.map(({ key, label }) => {
+    const items1 = DATA.filter(d => d.editor === key && d.pod === 1).sort((a,b) => a.date.localeCompare(b.date));
+    const items2 = DATA.filter(d => d.editor === key && d.pod === 2).sort((a,b) => a.date.localeCompare(b.date));
+    return `
+    <div class="editor-section">
+      <div class="editor-header">
+        <div class="editor-header-left">
+          <div class="editor-dot ${key}-dot"></div>
+          <div class="editor-title">${label}</div>
+        </div>
+        <div class="editor-total ${key}-total" id="${key}-badge">0 creatives</div>
+      </div>
+      <div class="pod-tabs">
+        <div class="pod-tab ${key}-tab active" onclick="switchTab(this,'${key}-p1')">Pod 1 — <span id="${key}-p1-tab-n">0</span></div>
+        <div class="pod-tab ${key}-tab"        onclick="switchTab(this,'${key}-p2')">Pod 2 — <span id="${key}-p2-tab-n">0</span></div>
+      </div>
+      <div id="${key}-p1" class="pod-content active">
+        <div class="creative-list">${buildList(items1, key, 'p1')}</div>
+      </div>
+      <div id="${key}-p2" class="pod-content">
+        <div class="creative-list">${buildList(items2, key, 'p2')}</div>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function buildList(items, editorKey, podKey) {
+  if (!items.length) return `<div class="empty-pod">No submissions in this period.</div>`;
+
+  let html = '';
+  let lastMonth = null;
+
+  items.forEach(item => {
+    const mk = monthKey(item.date);
+    if (mk !== lastMonth) {
+      html += `<div class="month-divider" data-month="${mk}">${monthLabel(mk)}</div>`;
+      lastMonth = mk;
+    }
+    const hasLink = !!item.link;
+    const idEl = hasLink
+      ? `<a class="creative-id has-link" href="${item.link}" target="_blank">${item.id}</a>`
+      : `<span class="creative-id">${item.id}</span>`;
+    const linkIcon = hasLink ? `<a class="link-icon" href="${item.link}" target="_blank">↗ Frame</a>` : '';
+    html += `
+      <div class="creative-row" data-date="${item.date}">
+        <div class="creative-row-left"><span class="creative-num">·</span>${idEl}</div>
+        <div class="creative-right"><span class="creative-date">${fmt(item.date)}</span>${linkIcon}</div>
+      </div>`;
+  });
+
+  html += `<div class="no-results" id="${editorKey}-${podKey}-empty">No deliveries in this date range.</div>`;
+  return html;
+}
+
+// ═══════════════════════════════════════════════════════════════════════════
+//  FILTER + COUNTS
+// ═══════════════════════════════════════════════════════════════════════════
+function switchTab(clickedTab, contentId) {
+  const section = clickedTab.closest('.editor-section');
+  section.querySelectorAll('.pod-tab').forEach(t => t.classList.remove('active'));
+  section.querySelectorAll('.pod-content').forEach(c => c.classList.remove('active'));
+  clickedTab.classList.add('active');
+  document.getElementById(contentId).classList.add('active');
+}
+
+function applyFilter() {
+  const from = document.getElementById('date-from').value;
+  const to   = document.getElementById('date-to').value;
+  if (!from || !to) return;
+
+  const fromDate = new Date(from);
+  const toDate   = new Date(to);
+
+  const fmtLabel = d => new Date(d).toLocaleDateString('en-US', { month:'short', day:'numeric', year:'numeric' });
+  document.getElementById('period-label').textContent =
+    `${fmtLabel(from)} – ${fmtLabel(to)}  ·  Pods 1 & 2  ·  QC submissions only`;
+
+  const counts = {};
+  EDITORS.forEach(({ key }) => counts[key] = { p1:0, p2:0 });
+
+  EDITORS.forEach(({ key }) => {
+    [1, 2].forEach(pod => {
+      const panelId = `${key}-p${pod}`;
+      const panel   = document.getElementById(panelId);
+      if (!panel) return;
+
+      let visible = 0;
+      panel.querySelectorAll('.creative-row').forEach(row => {
+        const d = new Date(row.dataset.date);
+        const show = d >= fromDate && d <= toDate;
+        row.classList.toggle('hidden', !show);
+        if (show) visible++;
+      });
+      counts[key][`p${pod}`] = visible;
+
+      panel.querySelectorAll('.month-divider').forEach(div => {
+        let next = div.nextElementSibling, hasVisible = false;
+        while (next && !next.classList.contains('month-divider')) {
+          if (next.classList.contains('creative-row') && !next.classList.contains('hidden')) hasVisible = true;
+          next = next.nextElementSibling;
+        }
+        div.classList.toggle('hidden', !hasVisible);
+      });
+
+      const emptyEl = document.getElementById(`${key}-p${pod}-empty`);
+      if (emptyEl) emptyEl.classList.toggle('visible', visible === 0);
+    });
+  });
+
+  updateCounts(counts);
+}
+
+function updateCounts(counts) {
+  const totals = {};
+  EDITORS.forEach(({ key }) => {
+    const p1 = counts[key].p1, p2 = counts[key].p2, total = p1 + p2;
+    totals[key] = total;
+    document.getElementById(`${key}-count`).textContent      = total;
+    document.getElementById(`${key}-p1-count`).textContent   = p1;
+    document.getElementById(`${key}-p2-count`).textContent   = p2;
+    document.getElementById(`${key}-badge`).textContent      = `${total} creatives`;
+    document.getElementById(`${key}-p1-tab-n`).textContent   = p1;
+    document.getElementById(`${key}-p2-tab-n`).textContent   = p2;
+  });
+
+  const max = Math.max(...Object.values(totals), 1);
+  EDITORS.forEach(({ key }) => {
+    document.getElementById(`bar-${key}`).style.width = (totals[key] / max * 100) + '%';
+    document.getElementById(`bar-${key}-n`).textContent = totals[key];
+  });
+}
+
+function resetFilter() {
+  document.getElementById('date-from').value = '2025-12-01';
+  document.getElementById('date-to').value   = '2026-03-17';
+  applyFilter();
+}
+
+// ── Init ──────────────────────────────────────────────────────────────────
+buildSummaryCards();
+buildBarChart();
+buildEditorSections();
+applyFilter();
+</script>
+
+</body>
+</html>

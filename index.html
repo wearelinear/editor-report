@@ -275,6 +275,10 @@
     .creative-date  { font-size: 11px; color: var(--muted); white-space: nowrap; }
     .link-icon { opacity: 0; font-size: 10px; color: var(--muted); transition: opacity 0.12s; text-decoration: none; }
     .creative-row:hover .link-icon { opacity: 1; }
+    .slack-icon { opacity: 0; font-size: 9px; color: #7B68EE; transition: opacity 0.12s; text-decoration: none; line-height: 1; display: flex; align-items: center; }
+    .slack-icon svg { fill: currentColor; }
+    .creative-row:hover .slack-icon { opacity: 0.7; }
+    .creative-row:hover .slack-icon:hover { opacity: 1; }
 
     .month-divider { padding: 5px 20px 4px; font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; color: var(--muted); background: rgba(255,255,255,0.018); border-bottom: 1px solid var(--border); }
     .month-divider.hidden { display: none; }
@@ -836,9 +840,12 @@ function buildList(items, key, podKey) {
       ? `<a class="creative-id has-link" href="${item.link}" target="_blank">${item.id}</a>`
       : `<span class="creative-id">${item.id}</span>`;
     const icon = item.link ? `<a class="link-icon" href="${item.link}" target="_blank">↗</a>` : '';
+    const slackIcon = item.slack
+      ? `<a class="slack-icon" href="${item.slack}" target="_blank" title="View on Slack"><svg width="10" height="10" viewBox="0 0 24 24"><path d="M5.042 15.165a2.528 2.528 0 0 1-2.52 2.523A2.528 2.528 0 0 1 0 15.165a2.527 2.527 0 0 1 2.522-2.52h2.52v2.52zm1.271 0a2.527 2.527 0 0 1 2.521-2.52 2.527 2.527 0 0 1 2.521 2.52v6.313A2.528 2.528 0 0 1 8.834 24a2.528 2.528 0 0 1-2.521-2.522v-6.313zM8.834 5.042a2.528 2.528 0 0 1-2.521-2.52A2.528 2.528 0 0 1 8.834 0a2.528 2.528 0 0 1 2.521 2.522v2.52H8.834zm0 1.271a2.528 2.528 0 0 1 2.521 2.521 2.528 2.528 0 0 1-2.521 2.521H2.522A2.528 2.528 0 0 1 0 8.834a2.528 2.528 0 0 1 2.522-2.521h6.312zm10.122 2.521a2.528 2.528 0 0 1 2.522-2.521A2.528 2.528 0 0 1 24 8.834a2.528 2.528 0 0 1-2.522 2.521h-2.522V8.834zm-1.268 0a2.528 2.528 0 0 1-2.523 2.521 2.527 2.527 0 0 1-2.52-2.521V2.522A2.527 2.527 0 0 1 15.165 0a2.528 2.528 0 0 1 2.523 2.522v6.312zm-2.523 10.122a2.528 2.528 0 0 1 2.523 2.522A2.528 2.528 0 0 1 15.165 24a2.527 2.527 0 0 1-2.52-2.522v-2.522h2.52zm0-1.268a2.527 2.527 0 0 1-2.52-2.523 2.526 2.526 0 0 1 2.52-2.52h6.313A2.527 2.527 0 0 1 24 15.165a2.528 2.528 0 0 1-2.522 2.523h-6.313z"/></svg></a>`
+      : '';
     html += `<div class="creative-row" data-date="${item.date}">
       <div class="creative-row-left"><span class="creative-num">·</span>${idEl}</div>
-      <div class="creative-right"><span class="creative-date">${fmt(item.date)}</span>${icon}</div>
+      <div class="creative-right"><span class="creative-date">${fmt(item.date)}</span>${icon}${slackIcon}</div>
     </div>`;
   });
   html += `<div class="no-results" id="${key}-${podKey}-empty">No deliveries in this date range.</div>`;

@@ -1,7 +1,7 @@
 # SOP: Weekly Creative Output Report Refresh
 
 **Live report:** https://wearelinear.github.io/editor-report/
-**Tracks:** Naqeeb, Lucas, Rami, Felipe, Matt, Ardee, Bruno Volpe, Rodrigo, Pilar
+**Tracks:** Naqeeb, Lucas, Rami, Felipe, Matt, Bruno Volpe, Rodrigo, Pilar
 
 ---
 
@@ -68,5 +68,5 @@ After the first run, Claude will remember the path.
 |---|---|
 | GitHub repo | https://github.com/wearelinear/editor-report |
 | Live URL | https://wearelinear.github.io/editor-report/ |
-| Pods 1 & 2 channels | #linear-pod-1-qc-requests, #linear-pod-2-qc-requests |
+| Pods 1 & 2 channel | #linear-creative-review (active from 2026-05-26) |
 | Pod 4 channel | #linear-pod-4-creative-production |

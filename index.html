@@ -313,8 +313,7 @@
   <div class="control-group">
     <span class="ctrl-label">Pod</span>
     <div class="ctrl-sep"></div>
-    <button class="pod-toggle active" data-pod="1" onclick="togglePod(this)">Pod 1</button>
-    <button class="pod-toggle active" data-pod="2" onclick="togglePod(this)">Pod 2</button>
+    <button class="pod-toggle active" data-pod="12" onclick="togglePod(this)">Pods 1 & 2</button>
     <button class="pod-toggle active" data-pod="4" onclick="togglePod(this)">Pod 4</button>
   </div>
 
@@ -347,7 +346,7 @@
 <!-- Editor sections -->
 <div class="editors" id="editors"></div>
 
-<footer id="footer">Generated Mar 31, 2026 &nbsp;·&nbsp; Source: Slack #linear-pod-1-qc-requests, #linear-pod-2-qc-requests, #linear-pod-4-creative-production &nbsp;·&nbsp; <a href="sop.html" style="color:inherit;text-decoration:underline;text-underline-offset:3px;">How to refresh →</a></footer>
+<footer id="footer">Generated May 26, 2026 &nbsp;·&nbsp; Source: Slack #linear-creative-review, #linear-pod-4-creative-production &nbsp;·&nbsp; <a href="sop.html" style="color:inherit;text-decoration:underline;text-underline-offset:3px;">How to refresh →</a></footer>
 
 <script>
 // ═══════════════════════════════════════════════════════════════════════════
@@ -900,20 +899,17 @@ const DATA = [
 //  CONFIG
 // ═══════════════════════════════════════════════════════════════════════════
 const EDITORS = [
-  { key:'lucas',   label:'Lucas Krikorian', group:'p12' },
   { key:'naqeeb',  label:'Naqeeb',          group:'p12' },
   { key:'felipe',  label:'Felipe',           group:'p12', role:'designer' },
   { key:'rami',    label:'Rami Sleem',       group:'p12' },
   { key:'pilar',   label:'Pilar',            group:'p4',  role:'designer' },
-  { key:'matt',    label:'Matt',             group:'p4' },
-  { key:'ardee',   label:'Ardee',            group:'p4' },
   { key:'brunov',  label:'Bruno Volpe',      group:'p4' },
   { key:'rodrigo', label:'Rodrigo',          group:'p4' },
 ];
 
 const MONTHS = ['January','February','March','April','May','June','July','August','September','October','November','December'];
 
-let activePods = new Set([1, 2, 4]);
+let activePods = new Set([12, 4]);
 
 // ═══════════════════════════════════════════════════════════════════════════
 //  BUILD DOM
@@ -948,14 +944,10 @@ function render() {
   // Summary cards
   document.getElementById('summary').innerHTML = EDITORS.map(({ key, label, role, group }) => {
     const roleBadge = role ? `<span class="role-badge">${role}</span>` : '';
-    const podBreak  = group === 'p12'
-      ? `<div class="pod-breakdown"><div class="pod-pill">Pod 1 <span id="${key}-p1-count">0</span></div><div class="pod-pill">Pod 2 <span id="${key}-p2-count">0</span></div></div>`
-      : '';
     return `<div class="summary-card ${key}-card" data-group="${group}">
       <div class="card-top"><div class="editor-name">${label}</div>${roleBadge}</div>
       <div class="big-number" id="${key}-count">0</div>
       <div class="sub-label">creatives delivered</div>
-      ${podBreak}
     </div>`;
   }).join('');
 
@@ -973,14 +965,8 @@ function render() {
     const roleTag = role ? `<span class="editor-role">${role}</span>` : '';
     let body;
     if (group === 'p12') {
-      const i1 = DATA.filter(d => d.editor === key && d.pod === 1).sort((a,b) => a.date.localeCompare(b.date));
-      const i2 = DATA.filter(d => d.editor === key && d.pod === 2).sort((a,b) => a.date.localeCompare(b.date));
-      body = `<div class="pod-tabs">
-          <div class="pod-tab ${key}-tab active" data-pod="1" onclick="switchTab(this,'${key}-p1')">Pod 1 — <span id="${key}-p1-tab-n">0</span></div>
-          <div class="pod-tab ${key}-tab"        data-pod="2" onclick="switchTab(this,'${key}-p2')">Pod 2 — <span id="${key}-p2-tab-n">0</span></div>
-        </div>
-        <div id="${key}-p1" class="pod-content active"><div class="creative-list">${buildList(i1, key, 'p1')}</div></div>
-        <div id="${key}-p2" class="pod-content"><div class="creative-list">${buildList(i2, key, 'p2')}</div></div>`;
+      const items = DATA.filter(d => d.editor === key && (d.pod === 1 || d.pod === 2)).sort((a,b) => a.date.localeCompare(b.date));
+      body = `<div id="${key}-p12"><div class="creative-list">${buildList(items, key, 'p12')}</div></div>`;
     } else {
       const items = DATA.filter(d => d.editor === key).sort((a,b) => a.date.localeCompare(b.date));
       body = `<div class="creative-list">${buildList(items, key, 'all')}</div>`;
@@ -1031,29 +1017,12 @@ function togglePod(btn) {
 }
 
 function syncPodVisibility() {
-  const showP12 = activePods.has(1) || activePods.has(2);
+  const showP12 = activePods.has(12);
   const showP4  = activePods.has(4);
 
-  // Cards & bar rows
   document.querySelectorAll('[data-group]').forEach(el => {
     const g = el.dataset.group;
     el.classList.toggle('hidden', g === 'p12' ? !showP12 : !showP4);
-  });
-
-  // Pod tabs within P12 editors — show/hide individual tabs
-  EDITORS.filter(e => e.group === 'p12').forEach(({ key }) => {
-    const sec = document.querySelector(`.editor-section[data-key="${key}"]`);
-    if (!sec) return;
-    sec.querySelectorAll('.pod-tab').forEach(tab => {
-      const p = +tab.dataset.pod;
-      const visible = activePods.has(p);
-      tab.classList.toggle('hidden', !visible);
-      // If active tab is now hidden, switch to first visible
-      if (!visible && tab.classList.contains('active')) {
-        const firstVisible = sec.querySelector('.pod-tab:not(.hidden)');
-        if (firstVisible) firstVisible.click();
-      }
-    });
   });
 }
 
@@ -1067,7 +1036,7 @@ function applyFilter() {
   const fromDate = new Date(from), toDate = new Date(to);
 
   const counts = {};
-  EDITORS.forEach(({ key }) => counts[key] = { p1:0, p2:0, p4:0 });
+  EDITORS.forEach(({ key }) => counts[key] = { p12:0, p4:0 });
 
   // Filter rows; only count pods that are active
   document.querySelectorAll('.creative-row').forEach(row => {
@@ -1079,19 +1048,16 @@ function applyFilter() {
     const sec = document.querySelector(`.editor-section[data-key="${key}"]`);
     if (!sec) return;
     if (group === 'p12') {
-      [1, 2].forEach(pod => {
-        const panel = document.getElementById(`${key}-p${pod}`);
-        if (!panel) return;
-        let vis = 0;
-        // Only count if pod is active
-        if (activePods.has(pod)) {
-          panel.querySelectorAll('.creative-row').forEach(r => { if (!r.classList.contains('hidden')) vis++; });
-        }
-        counts[key][`p${pod}`] = vis;
-        refreshDividers(panel);
-        const empty = document.getElementById(`${key}-p${pod}-empty`);
-        if (empty) empty.classList.toggle('visible', vis === 0 && activePods.has(pod));
-      });
+      const panel = document.getElementById(`${key}-p12`);
+      if (!panel) return;
+      let vis = 0;
+      if (activePods.has(12)) {
+        panel.querySelectorAll('.creative-row').forEach(r => { if (!r.classList.contains('hidden')) vis++; });
+      }
+      counts[key].p12 = vis;
+      refreshDividers(panel);
+      const empty = document.getElementById(`${key}-p12-empty`);
+      if (empty) empty.classList.toggle('visible', vis === 0 && activePods.has(12));
     } else {
       let vis = 0;
       if (activePods.has(4)) {
@@ -1122,21 +1088,13 @@ function updateCounts(counts) {
   // Compute totals
   const totals = {};
   EDITORS.forEach(({ key, group }) => {
-    totals[key] = group === 'p12'
-      ? (activePods.has(1) ? counts[key].p1 : 0) + (activePods.has(2) ? counts[key].p2 : 0)
-      : counts[key].p4;
+    totals[key] = group === 'p12' ? counts[key].p12 : counts[key].p4;
   });
 
-  EDITORS.forEach(({ key, group }) => {
+  EDITORS.forEach(({ key }) => {
     const t = totals[key];
     document.getElementById(`${key}-count`).textContent = t;
     document.getElementById(`${key}-badge`).textContent = `${t} creatives`;
-    if (group === 'p12') {
-      document.getElementById(`${key}-p1-count`).textContent = counts[key].p1;
-      document.getElementById(`${key}-p2-count`).textContent = counts[key].p2;
-      document.getElementById(`${key}-p1-tab-n`).textContent = counts[key].p1;
-      document.getElementById(`${key}-p2-tab-n`).textContent = counts[key].p2;
-    }
   });
 
   // Bar chart — scale against all visible editors together

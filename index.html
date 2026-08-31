@@ -294,6 +294,7 @@
 <div class="top-bar">
   <div>
     <h1>Creative Output Report</h1>
+    <p id="last-updated">Last updated on <span id="last-updated-value"></span></p>
   </div>
 </div>
 
@@ -346,7 +347,7 @@
 <!-- Editor sections -->
 <div class="editors" id="editors"></div>
 
-<footer id="footer">Generated May 26, 2026 &nbsp;·&nbsp; Source: Slack #linear-creative-review, #linear-pod-4-creative-production &nbsp;·&nbsp; <a href="sop.html" style="color:inherit;text-decoration:underline;text-underline-offset:3px;">How to refresh →</a></footer>
+<footer id="footer">Generated <span id="footer-generated-value"></span> &nbsp;·&nbsp; Source: Slack #linear-creative-review, #linear-pod-4-creative-production &nbsp;·&nbsp; <a href="sop.html" style="color:inherit;text-decoration:underline;text-underline-offset:3px;">How to refresh →</a></footer>
 
 <script>
 // ═══════════════════════════════════════════════════════════════════════════
@@ -354,6 +355,10 @@
 //  { editor, pod, id, date, link }
 //  pod: 1 | 2 (Pods 1&2 editors) | 4 (Pod 4 editors)
 // ═══════════════════════════════════════════════════════════════════════════
+
+// Update this on every refresh — drives both the header and footer "generated" date.
+const REPORT_GENERATED = 'August 31, 2026';
+
 const DATA = [
 
   // ── NAQEEB · Pod 1 ────────────────────────────────────────────────────
@@ -1383,6 +1388,8 @@ document.getElementById('date-from').addEventListener('change', () => document.q
 document.getElementById('date-to').addEventListener('change',   () => document.querySelectorAll('.preset-btn').forEach(b => b.classList.remove('active')));
 
 // ── Init ──────────────────────────────────────────────────────────────────
+document.getElementById('last-updated-value').textContent = REPORT_GENERATED;
+document.getElementById('footer-generated-value').textContent = REPORT_GENERATED;
 render();
 syncPodVisibility();
 applyFilter();

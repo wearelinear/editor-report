@@ -305,7 +305,7 @@
     <label>From</label>
     <input type="date" id="date-from" value="2025-12-01">
     <span class="filter-sep">→</span>
-    <input type="date" id="date-to" value="2026-10-11">
+    <input type="date" id="date-to" value="2026-10-18">
     <button class="ctrl-btn" onclick="applyFilter()">Apply</button>
     <button class="ctrl-btn" onclick="resetFilter()">Reset</button>
   </div>
@@ -357,7 +357,7 @@
 // ═══════════════════════════════════════════════════════════════════════════
 
 // Update this on every refresh — drives both the header and footer "generated" date.
-const REPORT_GENERATED = 'October 12, 2026';
+const REPORT_GENERATED = 'October 19, 2026';
 
 const DATA = [
 
@@ -1232,6 +1232,31 @@ const DATA = [
   { editor:'rami',    pod:1, id:'JMDC202',  date:'2026-10-09', link:'https://f.io/xZP9cbjT', slack:'https://linear-marketing.slack.com/archives/C0B634VJB8T/p1791557573342779' },
   { editor:'felipe',  pod:1, id:'WBM006',   date:'2026-10-09', link:'https://f.io/gM9CaiE9', slack:'https://linear-marketing.slack.com/archives/C0B634VJB8T/p1791574504497179' },
   { editor:'brunov',  pod:4, id:'AM02',     date:'2026-10-09', link:'https://f.io/TqcB5dhz', slack:'https://linear-marketing.slack.com/archives/C07V6TU1VDK/p1791578723494919' },
+
+  // ── WEEK OF OCT 12 – OCT 18, 2026 ──────────────────────────────────────────
+  { editor:'pilar',   pod:4, id:'LG61',    date:'2026-10-12', link:'https://f.io/NhfVYcvu', slack:'https://linear-marketing.slack.com/archives/C07V6TU1VDK/p1791810359164709' },
+  { editor:'felipe',  pod:1, id:'VMP022',  date:'2026-10-12', link:'https://f.io/Bh3x-Z6C', slack:'https://linear-marketing.slack.com/archives/C0B634VJB8T/p1791813839230319' },
+  { editor:'naqeeb',  pod:1, id:'TPR 2B',  date:'2026-10-12', link:'https://f.io/mVla2ykR', slack:'https://linear-marketing.slack.com/archives/C0B634VJB8T/p1791836132024409' },
+  { editor:'brunov',  pod:4, id:'IDC11b',  date:'2026-10-12', link:'https://f.io/BKj0RIvg', slack:'https://linear-marketing.slack.com/archives/C07V6TU1VDK/p1791845014151329' },
+  { editor:'pilar',   pod:4, id:'RE05',    date:'2026-10-13', link:'https://f.io/cMCfIilE', slack:'https://linear-marketing.slack.com/archives/C07V6TU1VDK/p1791913708886699' },
+  { editor:'naqeeb',  pod:1, id:'JOY 2A_03', date:'2026-10-13', link:'https://f.io/QEGzZA7n', slack:'https://linear-marketing.slack.com/archives/C0B634VJB8T/p1791924920296809' },
+  { editor:'rami',    pod:1, id:'JOY 2A_01', date:'2026-10-13', link:'https://f.io/CuXryRyc', slack:'https://linear-marketing.slack.com/archives/C0B634VJB8T/p1791927074873349' },
+  { editor:'rami',    pod:1, id:'JOY 2A_02', date:'2026-10-13', link:'https://f.io/NoUpq1R9', slack:'https://linear-marketing.slack.com/archives/C0B634VJB8T/p1791927074873349' },
+  { editor:'felipe',  pod:1, id:'VMP023',  date:'2026-10-14', link:'https://f.io/-kfQPGrj', slack:'https://linear-marketing.slack.com/archives/C0B634VJB8T/p1791985805617529' },
+  { editor:'pilar',   pod:4, id:'MAO20 HO01 & HO02', date:'2026-10-14', link:'https://f.io/9Iubywm9', slack:'https://linear-marketing.slack.com/archives/C07V6TU1VDK/p1791989239329699' },
+  { editor:'pilar',   pod:4, id:'MOON15',  date:'2026-10-14', link:'https://f.io/W0ANWMgM', slack:'https://linear-marketing.slack.com/archives/C07V6TU1VDK/p1792000420850969' },
+  { editor:'naqeeb',  pod:1, id:'DPP R1_C5', date:'2026-10-14', link:'https://f.io/meuOuiLN', slack:'https://linear-marketing.slack.com/archives/C0B634VJB8T/p1792002551415809' },
+  { editor:'pilar',   pod:4, id:'MAO20 HO03', date:'2026-10-14', link:'https://f.io/bn6so3Zz', slack:'https://linear-marketing.slack.com/archives/C07V6TU1VDK/p1792003945323859' },
+  { editor:'brunov',  pod:4, id:'LG60',    date:'2026-10-14', link:'https://f.io/3crNaHNU', slack:'https://linear-marketing.slack.com/archives/C07V6TU1VDK/p1792006580440729' },
+  { editor:'pilar',   pod:4, id:'MAO20 HO04 - HO07', date:'2026-10-15', link:'https://f.io/sF822DPD', slack:'https://linear-marketing.slack.com/archives/C07V6TU1VDK/p1792076168815649' },
+  { editor:'rami',    pod:1, id:'DPP R1_C1', date:'2026-10-15', link:'https://f.io/VsvJO8kS', slack:'https://linear-marketing.slack.com/archives/C0B634VJB8T/p1792084622533339' },
+  { editor:'naqeeb',  pod:1, id:'AEO01',   date:'2026-10-15', link:'https://f.io/Qf4GIJEb', slack:'https://linear-marketing.slack.com/archives/C0B634VJB8T/p1792087214504099' },
+  { editor:'brunov',  pod:4, id:'HERO10',  date:'2026-10-16', link:'https://f.io/Ssa08xNb', slack:'https://linear-marketing.slack.com/archives/C07V6TU1VDK/p1792156833991569' },
+  { editor:'pilar',   pod:4, id:'MOON16',  date:'2026-10-16', link:'https://f.io/ObJFosoP', slack:'https://linear-marketing.slack.com/archives/C07V6TU1VDK/p1792162357963419' },
+  { editor:'naqeeb',  pod:1, id:'AEO02',   date:'2026-10-16', link:'https://f.io/C1UGOaMF', slack:'https://linear-marketing.slack.com/archives/C0B634VJB8T/p1792162458295069' },
+  { editor:'naqeeb',  pod:1, id:'TPR 1B',  date:'2026-10-16', link:'https://f.io/kqL_HJvC', slack:'https://linear-marketing.slack.com/archives/C0B634VJB8T/p1792170118202629' },
+  { editor:'pilar',   pod:4, id:'MOON17',  date:'2026-10-16', link:'https://f.io/Q5f53cOe', slack:'https://linear-marketing.slack.com/archives/C07V6TU1VDK/p1792173839324389' },
+  { editor:'rami',    pod:1, id:'DPP R1 C2', date:'2026-10-16', link:'https://f.io/ZgIgTFi6', slack:'https://linear-marketing.slack.com/archives/C0B634VJB8T/p1792182641115609' },
 
 ];
 

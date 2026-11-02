@@ -23,6 +23,7 @@
       --ardee:   #bf5af2;
       --brunov:  #ffcc02;
       --rodrigo: #ff6b35;
+      --denisse: #64d2ff;
     }
 
     body { background: var(--bg); color: var(--text); font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; min-height: 100vh; padding: 40px 32px; }
@@ -150,6 +151,7 @@
     .ardee-card::before  { background: var(--ardee); }
     .brunov-card::before { background: var(--brunov); }
     .rodrigo-card::before{ background: var(--rodrigo); }
+    .denisse-card::before{ background: var(--denisse); }
 
     .card-top { display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px; }
     .editor-name { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.8px; }
@@ -162,6 +164,7 @@
     .ardee-card  .editor-name { color: var(--ardee); }
     .brunov-card .editor-name { color: var(--brunov); }
     .rodrigo-card .editor-name{ color: var(--rodrigo); }
+    .denisse-card .editor-name{ color: var(--denisse); }
 
     .role-badge { font-size: 9px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; padding: 2px 6px; border-radius: 99px; background: rgba(255,255,255,0.06); color: var(--muted); flex-shrink: 0; }
 
@@ -197,6 +200,7 @@
     .ardee-fill   { background: var(--ardee); }
     .brunov-fill  { background: var(--brunov); }
     .rodrigo-fill { background: var(--rodrigo); }
+    .denisse-fill { background: var(--denisse); }
     .bar-count { font-size: 13px; font-weight: 700; width: 28px; text-align: right; flex-shrink: 0; }
 
     /* ── Editor sections ── */
@@ -227,6 +231,7 @@
     .ardee-dot   { background: var(--ardee); }
     .brunov-dot  { background: var(--brunov); }
     .rodrigo-dot { background: var(--rodrigo); }
+    .denisse-dot { background: var(--denisse); }
 
     .editor-title { font-size: 14px; font-weight: 700; }
     .editor-role  { font-size: 9px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.6px; color: var(--muted); background: rgba(255,255,255,0.06); padding: 2px 7px; border-radius: 99px; }
@@ -242,6 +247,7 @@
     .ardee-total   { background: rgba(191,90,242,0.15);  color: var(--ardee); }
     .brunov-total  { background: rgba(255,204,2,0.15);   color: var(--brunov); }
     .rodrigo-total { background: rgba(255,107,53,0.15);  color: var(--rodrigo); }
+    .denisse-total { background: rgba(100,210,255,0.15); color: var(--denisse); }
 
     .chevron { font-size: 12px; color: var(--muted); transition: transform 0.2s; flex-shrink: 0; }
     .editor-section.collapsed .chevron { transform: rotate(-90deg); }
@@ -1317,8 +1323,9 @@ const EDITORS = [
   { key:'felipe',  label:'Felipe',           group:'p12', role:'designer' },
   { key:'rami',    label:'Rami Sleem',       group:'p12' },
   { key:'pilar',   label:'Pilar',            group:'p4',  role:'designer' },
-  { key:'brunov',  label:'Bruno Volpe',      group:'p4' },
   { key:'rodrigo', label:'Rodrigo',          group:'p4' },
+  { key:'denisse', label:'Denisse',          group:'p4' },  // started 2026-11-02
+  { key:'brunov',  label:'Bruno Volpe',      group:'p4',  former:true },  // left 2026-10-20 — history only, no card/bar
 ];
 
 const MONTHS = ['January','February','March','April','May','June','July','August','September','October','November','December'];
@@ -1356,7 +1363,7 @@ function buildList(items, key, podKey) {
 
 function render() {
   // Summary cards
-  document.getElementById('summary').innerHTML = EDITORS.map(({ key, label, role, group }) => {
+  document.getElementById('summary').innerHTML = EDITORS.filter(e => !e.former).map(({ key, label, role, group }) => {
     const roleBadge = role ? `<span class="role-badge">${role}</span>` : '';
     return `<div class="summary-card ${key}-card" data-group="${group}">
       <div class="card-top"><div class="editor-name">${label}</div>${roleBadge}</div>
@@ -1366,7 +1373,7 @@ function render() {
   }).join('');
 
   // Bar chart
-  document.getElementById('bar-chart').innerHTML = EDITORS.map(({ key, label, group }) =>
+  document.getElementById('bar-chart').innerHTML = EDITORS.filter(e => !e.former).map(({ key, label, group }) =>
     `<div class="bar-row" data-group="${group}">
       <div class="bar-label" style="color:var(--${key})">${label.split(' ')[0]}</div>
       <div class="bar-track"><div class="bar-fill ${key}-fill" id="bar-${key}" style="width:0%"></div></div>
@@ -1505,15 +1512,16 @@ function updateCounts(counts) {
     totals[key] = group === 'p12' ? counts[key].p12 : counts[key].p4;
   });
 
-  EDITORS.forEach(({ key }) => {
+  EDITORS.forEach(({ key, former }) => {
     const t = totals[key];
-    document.getElementById(`${key}-count`).textContent = t;
+    if (!former) document.getElementById(`${key}-count`).textContent = t;
     document.getElementById(`${key}-badge`).textContent = `${t} creatives`;
   });
 
-  // Bar chart — scale against all visible editors together
-  const max = Math.max(...EDITORS.map(e => totals[e.key]), 1);
-  EDITORS.forEach(({ key }) => {
+  // Bar chart — scale against all visible (current) editors together
+  const current = EDITORS.filter(e => !e.former);
+  const max = Math.max(...current.map(e => totals[e.key]), 1);
+  current.forEach(({ key }) => {
     document.getElementById(`bar-${key}`).style.width = (totals[key] / max * 100) + '%';
     document.getElementById(`bar-${key}-n`).textContent = totals[key];
   });
